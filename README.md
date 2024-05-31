@@ -30,6 +30,10 @@ Pasos del Ejercicio
 5. Usar code first para crear la base de datos.
 6. Utilizar el patrón repositorio cada entidad.
 7. Crear los controladores para cada entidad.
+8. Crear los documentos HTML necesarios para poder conectarse con la API
+    - Listado: contendrá el listado de los libros y la posibilidad de eliminarlos con un mensaje de confirmacion.
+    - Creacion: un nuevo html que mostrará todos los datos para crear un nuevo libro. Al cargarlo exitosamente debe redireccionar al listado.
+    - Actualizacion: un nuevo html similar a la pagina de creación solo que no deberá permitir modificar el ID. Debe cargar los datos del libro a modificar.
 
 Instalar los paquetes necesarios:
 
