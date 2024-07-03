@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Luca\\OneDrive\\Educación\\TUV\\3erCuatrimestre\\Programación3\\Simulacro parcial 2\\library-db-exercise-LucaZuninoD\\LibreriaApplication\\WebApplication1\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.Libreria.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.build.Libreria.props",
+      "PackagePath": "build\\Libreria.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildMultiTargeting.Libreria.props",
+      "PackagePath": "buildMultiTargeting\\Libreria.props"
+    },
+    {
+      "Id": "obj\\Debug\\net6.0\\staticwebassets\\msbuild.buildTransitive.Libreria.props",
+      "PackagePath": "buildTransitive\\Libreria.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

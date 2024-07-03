@@ -1,0 +1,541 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Biblioteca</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+
+        .float-right {
+            float: right !important;
+        }
+
+        .btn-group {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Gestión de Biblioteca</h1>
+        <hr>
+
+
+        <!-- Libros -->
+        <div id="libros">
+            <h2>Libros</h2>
+            <div id="crearEditarLibro" style="display: none;">
+                <h3 id="accionLibro">Crear Nuevo Libro</h3>
+                <form id="formLibro">
+                    <input type="hidden" id="libroId">
+                    <div class="form-group">
+                        <label for="isbnLibro">ISBN:</label>
+                        <input type="text" class="form-control" id="isbnLibro" name="isbnLibro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tituloLibro">Título:</label>
+                        <input type="text" class="form-control" id="tituloLibro" name="tituloLibro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="autorId">Autor:</label>
+                        <select class="form-control" id="autorId" name="autorId" required>
+                            <!-- Opciones de autores se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaPublicacionLibro">Fecha de Publicación:</label>
+                        <input type="date" class="form-control" id="fechaPublicacionLibro" name="fechaPublicacionLibro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="generoId">Género:</label>
+                        <select class="form-control" id="generoId" name="generoId" required>
+                            <!-- Opciones de géneros se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="guardarLibroBtn">Guardar</button>
+                        <button type="button" class="btn btn-secondary" id="cancelarLibroBtn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="listaLibros">
+                <button type="button" class="btn btn-success mb-3" onclick="mostrarFormularioLibro('crear')">Crear Nuevo Libro</button>
+                <h3>Listado de Libros</h3>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ISBN</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Fecha de Publicación</th>
+                            <th>Género</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaLibros">
+                        <!-- Aquí se cargarán los libros -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Géneros -->
+        <div id="generos">
+            <h2>Géneros</h2>
+
+            <div id="listaGeneros">
+                <button type="button" class="btn btn-success mb-3" onclick="mostrarFormularioGenero('crear')">Crear Nuevo Género</button>
+                <h3>Listado de Géneros</h3>
+                <ul class="list-group" id="listaGenerosUl">
+                    <!-- Aquí se cargarán los géneros -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Autores -->
+        <div id="autores">
+            <h2>Autores</h2>
+            <div id="listaAutores">
+                <button type="button" class="btn btn-success mb-3" onclick="mostrarFormularioAutor('crear')">Crear Nuevo Autor</button>
+                <h3>Listado de Autores</h3>
+                <ul class="list-group" id="listaAutoresUl">
+                    <!-- Aquí se cargarán los autores -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script para Bootstrap y jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Script para la interacción con la API -->
+    <script>
+        // Cargar datos al cargar la página
+        $(document).ready(function () {
+            cargarLibros();
+            cargarGeneros();
+            cargarAutores();
+
+            // Manejar el envío del formulario de libros
+            $('#formLibro').submit(function (event) {
+                event.preventDefault();
+                guardarLibro();
+            });
+
+            // Manejar el envío del formulario de géneros
+            $('#formGenero').submit(function (event) {
+                event.preventDefault();
+                guardarGenero();
+            });
+
+            // Manejar el envío del formulario de autores
+            $('#formAutor').submit(function (event) {
+                event.preventDefault();
+                guardarAutor();
+            });
+
+            // Cancelar la edición de libro
+            $('#cancelarLibroBtn').click(function () {
+                limpiarFormularioLibro();
+                mostrarListaLibros();
+            });
+
+            // Cancelar la edición de género
+            $('#cancelarGeneroBtn').click(function () {
+                limpiarFormularioGenero();
+                mostrarListaGeneros();
+            });
+
+            // Cancelar la edición de autor
+            $('#cancelarAutorBtn').click(function () {
+                limpiarFormularioAutor();
+                mostrarListaAutores();
+            });
+        });
+
+        // Funciones para Libros
+        function cargarLibros() {
+            $.ajax({
+                url: '/api/Libro/getLibros',
+                method: 'GET',
+                success: function (libros) {
+                    mostrarLibros(libros);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al cargar libros:', textStatus, errorThrown);
+                    alert('Error al cargar libros. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+        function mostrarLibros(libros) {
+            var lista = $('#tablaLibros');
+            lista.empty();
+            libros.forEach(function (libro) {
+                var autorNombre = libro.autor ? libro.autor.nombre : 'Sin Autor';
+                var generoNombre = libro.genero ? libro.genero.nombre : 'Sin Género';
+                lista.append(`<tr>
+                                        <td>${libro.isbn}</td>
+                                        <td>${libro.titulo}</td>
+                                        <td>${autorNombre}</td>
+                                        <td>${libro.fechaPublicacion.substring(0, 10)}</td> <!-- Asegurar que solo se obtenga la parte de fecha (yyyy-mm-dd) -->
+                                        <td>${generoNombre}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="editarLibro(${libro.id})">Editar</button>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">Eliminar</button>
+                                        </td>
+                                    </tr>`);
+            });
+        }
+
+        function mostrarFormularioLibro(accion) {
+            if (accion === 'crear') {
+                $('#accionLibro').text('Crear Nuevo Libro');
+                $('#libroId').val('');
+                $('#isbnLibro').val('');
+                $('#tituloLibro').val('');
+                $('#autorId').val('');
+                $('#fechaPublicacionLibro').val('');
+                $('#generoId').val('');
+            } else if (accion === 'editar') {
+                $('#accionLibro').text('Editar Libro');
+            }
+            $('#crearEditarLibro').show();
+            $('#listaLibros').hide();
+        }
+
+        function limpiarFormularioLibro() {
+            $('#formLibro').trigger('reset');
+        }
+
+        function mostrarListaLibros() {
+            $('#crearEditarLibro').hide();
+            $('#listaLibros').show();
+        }
+
+      
+
+            var url = libro.id ? '/api/Libro/putLibro' : '/api/Libro/createLibro';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(libro),
+                success: function () {
+                    cargarLibros();
+                    limpiarFormularioLibro();
+                    mostrarListaLibros();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al guardar libro:', textStatus, errorThrown);
+                    alert('Error al guardar libro. Consulta la consola para más detalles.');
+                }
+            });
+        }
+        // Función para editar un libro
+        function editarLibro(id) {
+            $.ajax({
+                url: '/api/Libro/getLibro/' + id,
+                method: 'GET',
+                success: function (libro) {
+                    // Llenar el formulario con los datos del libro obtenido
+                    $('#libroId').val(libro.id);
+                    $('#isbnLibro').val(libro.isbn);
+                    $('#tituloLibro').val(libro.titulo);
+                    $('#autorId').val(libro.autorId);
+                    $('#fechaPublicacionLibro').val(libro.fechaPublicacion.substring(0, 10));
+                    $('#generoId').val(libro.generoId);
+
+                    // Mostrar el formulario para editar
+                    mostrarFormularioLibro('editar');
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al cargar libro para editar:', textStatus, errorThrown);
+                    alert('Error al cargar libro para editar. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+        // Función para guardar un libro (POST o PUT)
+        function guardarLibro() {
+            var libroId = $('#libroId').val();
+            var isbn = $('#isbnLibro').val();
+            var titulo = $('#tituloLibro').val();
+            var autorId = $('#autorId').val();
+            var fechaPublicacion = $('#fechaPublicacionLibro').val();
+            var generoId = $('#generoId').val();
+
+            var url = libroId ? '/api/Libro/putLibro/' + libroId : '/api/Libro/createLibro';
+
+            var libro = {
+                id: libroId ? parseInt(libroId) : 0,
+                isbn: isbn,
+                titulo: titulo,
+                autorId: parseInt(autorId),
+                fechaPublicacion: fechaPublicacion,
+                generoId: parseInt(generoId)
+            };
+
+            $.ajax({
+                url: url,
+                method: libroId ? 'PUT' : 'POST', // Utiliza PUT para actualizar (editar) un libro existente
+                contentType: 'application/json',
+                data: JSON.stringify(libro),
+                success: function () {
+                    cargarLibros();
+                    limpiarFormularioLibro();
+                    mostrarListaLibros();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al guardar libro:', textStatus, errorThrown);
+                    alert('Error al guardar libro. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+
+
+        function eliminarLibro(id) {
+            if (confirm('¿Estás seguro de eliminar este libro?')) {
+                $.ajax({
+                    url: '/api/Libro/deleteLibro/' + id,
+                    method: 'DELETE',
+                    success: function () {
+                        cargarLibros();
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error('Error al eliminar libro:', textStatus, errorThrown);
+                        alert('Error al eliminar libro. Consulta la consola para más detalles.');
+                    }
+                });
+            }
+        }
+
+        // Funciones para Géneros
+        function cargarGeneros() {
+            $.ajax({
+                url: '/api/Genero/getGeneros',
+                method: 'GET',
+                success: function (generos) {
+                    mostrarGeneros(generos);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al cargar géneros:', textStatus, errorThrown);
+                    alert('Error al cargar géneros. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+        function mostrarGeneros(generos) {
+            var lista = $('#listaGenerosUl');
+            lista.empty();
+            generos.forEach(function (genero) {
+                lista.append(`<li class="list-group-item">${genero.nombre}
+                                    <button type="button" class="btn btn-sm btn-danger float-right mr-1" onclick="eliminarGenero(${genero.id})">Eliminar</button>
+                                </li>`);
+            });
+        }
+
+        function mostrarFormularioGenero(accion) {
+            if (accion === 'crear') {
+                $('#accionGenero').text('Crear Nuevo Género');
+                $('#generoId').val('');
+                $('#nombreGenero').val('');
+            } 
+            $('#listaGeneros').hide();
+        }
+
+        function limpiarFormularioGenero() {
+            $('#formGenero').trigger('reset');
+        }
+
+        function mostrarListaGeneros() {
+            $('#listaGeneros').show();
+        }
+
+        function guardarGenero() {
+            var genero = {
+                id: $('#generoId').val(),
+                nombre: $('#nombreGenero').val()
+            };
+
+            var url = genero.id ? '/api/Genero/putGenero' : '/api/Genero/createGenero';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(genero),
+                success: function () {
+                    cargarGeneros();
+                    limpiarFormularioGenero();
+                    mostrarListaGeneros();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al guardar género:', textStatus, errorThrown);
+                    alert('Error al guardar género. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+       
+        function eliminarGenero(id) {
+            if (confirm('¿Estás seguro de eliminar este género?')) {
+                $.ajax({
+                    url: '/api/Genero/deleteGenero/' + id,
+                    method: 'DELETE',
+                    success: function () {
+                        cargarGeneros();
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error('Error al eliminar género:', textStatus, errorThrown);
+                        alert('Error al eliminar género. Consulta la consola para más detalles.');
+                    }
+                });
+            }
+        }
+
+        // Funciones para Autores
+        function cargarAutores() {
+            $.ajax({
+                url: '/api/Autor/getAutores',
+                method: 'GET',
+                success: function (autores) {
+                    mostrarAutores(autores);
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al cargar autores:', textStatus, errorThrown);
+                    alert('Error al cargar autores. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+        function mostrarAutores(autores) {
+            var lista = $('#listaAutoresUl');
+            lista.empty();
+            autores.forEach(function (autor) {
+                lista.append(`<li class="list-group-item">${autor.nombre}
+                                    <button type="button" class="btn btn-sm btn-danger float-right mr-1" onclick="eliminarAutor(${autor.id})">Eliminar</button>
+                                </li>`);
+            });
+        }
+
+        function mostrarFormularioAutor(accion) {
+            if (accion === 'crear') {
+                $('#accionAutor').text('Crear Nuevo Autor');
+                $('#autorId').val('');
+                $('#nombreAutor').val('');
+                $('#fechaNacimientoAutor').val('');
+            } 
+            $('#listaAutores').hide();
+        }
+
+        function limpiarFormularioAutor() {
+            $('#formAutor').trigger('reset');
+        }
+
+        function mostrarListaAutores() {
+            $('#listaAutores').show();
+        }
+
+        function guardarAutor() {
+            var autor = {
+                id: $('#autorId').val(),
+                nombre: $('#nombreAutor').val(),
+                fechaNacimiento: $('#fechaNacimientoAutor').val()
+            };
+
+            var url = autor.id ? '/api/Autor/putAutor' : '/api/Autor/createAutor';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(autor),
+                success: function () {
+                    cargarAutores();
+                    limpiarFormularioAutor();
+                    mostrarListaAutores();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error('Error al guardar autor:', textStatus, errorThrown);
+                    alert('Error al guardar autor. Consulta la consola para más detalles.');
+                }
+            });
+        }
+
+      
+        function eliminarAutor(id) {
+            if (confirm('¿Estás seguro de eliminar este autor?')) {
+                $.ajax({
+                    url: '/api/Autor/deleteAutor/' + id,
+                    method: 'DELETE',
+                    success: function () {
+                        cargarAutores();
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.error('Error al eliminar autor:', textStatus, errorThrown);
+                        alert('Error al eliminar autor. Consulta la consola para más detalles.');
+                    }
+                });
+            }
+        }
+
+        // Inicialización
+        $(document).ready(function () {
+            cargarLibros();
+            cargarGeneros();
+            cargarAutores();
+
+            $('#btnMostrarCrearLibro').click(function () {
+                mostrarFormularioLibro('crear');
+            });
+
+            $('#btnCancelarLibro').click(function () {
+                limpiarFormularioLibro();
+                mostrarListaLibros();
+            });
+
+            $('#btnGuardarLibro').click(function () {
+                guardarLibro();
+            });
+
+            $('#btnMostrarCrearGenero').click(function () {
+                mostrarFormularioGenero('crear');
+            });
+
+            $('#btnCancelarGenero').click(function () {
+                limpiarFormularioGenero();
+                mostrarListaGeneros();
+            });
+
+            $('#btnGuardarGenero').click(function () {
+                guardarGenero();
+            });
+
+            $('#btnMostrarCrearAutor').click(function () {
+                mostrarFormularioAutor('crear');
+            });
+
+            $('#btnCancelarAutor').click(function () {
+                limpiarFormularioAutor();
+                mostrarListaAutores();
+            });
+
+            $('#btnGuardarAutor').click(function () {
+                guardarAutor();
+            });
+        });
+    </script>
+</body>
+
+</html>
+

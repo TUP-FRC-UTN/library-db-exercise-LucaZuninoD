@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "Hash": "Yi0uisHz8x4a3zZkXdBotiIOsESos1wVepp8iDqUxIo=",
+  "Source": "Libreria",
+  "BasePath": "_content/Libreria",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Libreria\\wwwroot",
+      "Source": "Libreria",
+      "ContentRoot": "C:\\Users\\Luca\\OneDrive\\Educación\\TUV\\3erCuatrimestre\\Programación3\\Simulacro parcial 2\\library-db-exercise-LucaZuninoD\\LibreriaApplication\\WebApplication1\\wwwroot\\",
+      "BasePath": "_content/Libreria",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Luca\\OneDrive\\Educación\\TUV\\3erCuatrimestre\\Programación3\\Simulacro parcial 2\\library-db-exercise-LucaZuninoD\\LibreriaApplication\\WebApplication1\\wwwroot\\index.html",
+      "SourceId": "Libreria",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Luca\\OneDrive\\Educación\\TUV\\3erCuatrimestre\\Programación3\\Simulacro parcial 2\\library-db-exercise-LucaZuninoD\\LibreriaApplication\\WebApplication1\\wwwroot\\",
+      "BasePath": "_content/Libreria",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    }
+  ]
+}
